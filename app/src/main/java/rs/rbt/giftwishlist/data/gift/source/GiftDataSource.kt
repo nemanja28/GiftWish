@@ -8,18 +8,25 @@ import rs.rbt.giftwishlist.data.gift.Gift
  */
 interface GiftDataSource {
 
-    fun loadData(employeeId: Int)
+    interface LoadGiftCallback {
 
-    fun getGiftWishList(): LiveData<List<Gift>>
+        fun onGiftsLoaded(gifts: List<Gift>)
 
-    fun loadGiftWishListByEmployeeId(employeeId: Int): LiveData<List<Gift>>?
+        fun onDataNotAvailable()
+    }
 
-    fun loadGiftWishListByEmployeeEmail(employeeId: Int): LiveData<List<Gift>>?
+    fun getGiftWishList(loadGiftCallback: LoadGiftCallback)
+
+    fun loadGiftWishListByEmployeeId(employeeId: Int, loadGiftCallback: LoadGiftCallback)
+
+    fun loadGiftWishListByEmployeeEmail(email: String, loadGiftCallback: LoadGiftCallback)
 
     fun saveGiftWish(gift: Gift)
 
     fun updateGiftWish(gift: Gift)
 
     fun removeGiftFromWishList(gift: Gift)
+
+    fun onDestroy()
 
 }

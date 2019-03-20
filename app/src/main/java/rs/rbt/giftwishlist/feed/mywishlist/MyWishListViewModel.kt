@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import org.jetbrains.anko.AnkoLogger
 import rs.rbt.giftwishlist.SingleLiveEvent
 import rs.rbt.giftwishlist.data.gift.Gift
+import rs.rbt.giftwishlist.data.gift.source.GiftDataSource
 import rs.rbt.giftwishlist.data.gift.source.GiftRepository
 
 /**
@@ -14,7 +15,7 @@ import rs.rbt.giftwishlist.data.gift.source.GiftRepository
  */
 class MyWishListViewModel(application: Application, private val giftRepository: GiftRepository) : AndroidViewModel(application), AnkoLogger {
 
-    private var mObservableGiftWishList: LiveData<List<Gift>> = MutableLiveData()
+    private var mObservableGiftWishList: MutableLiveData<List<Gift>> = MutableLiveData()
     val addNewGiftWishEvent = SingleLiveEvent<Void>()
     val editGiftWishEvent = SingleLiveEvent<Gift>()
     val giftItemClickEvent = SingleLiveEvent<Gift>()
@@ -23,11 +24,25 @@ class MyWishListViewModel(application: Application, private val giftRepository: 
         start()
     }
 
-    private fun start() {
-        giftRepository.loadData(1)
-        mObservableGiftWishList = giftRepository.getGiftWishList()
+    override fun onCleared() {
+        giftRepository.onDestroy()
+        super.onCleared()
     }
 
+
+    private fun start() {
+//        giftRepository.loadData(1)
+//        mObservableGiftWishList = giftRepository.getGiftWishList()
+        giftRepository.loadGiftWishListByEmployeeId(1, object : GiftDataSource.LoadGiftCallback{
+            override fun onGiftsLoaded(gifts: List<Gift>) {
+                mObservableGiftWishList.postValue(gifts)
+            }
+
+            override fun onDataNotAvailable() {
+            }
+
+        })
+    }
 
     fun addNewGiftWish() {
         addNewGiftWishEvent.call()

@@ -11,23 +11,19 @@ class GiftRepository(
     private val giftRemoteDataSource: GiftDataSource
 ) : GiftDataSource {
 
-    override fun loadData(employeeId: Int) {
-        giftLocalDataSource.loadData(employeeId)
+    override fun getGiftWishList(loadGiftCallback: GiftDataSource.LoadGiftCallback) {
+        //TODO: Add implementation for remote data source
+         giftLocalDataSource.getGiftWishList(loadGiftCallback)
     }
 
-    override fun getGiftWishList(): LiveData<List<Gift>> {
+    override fun loadGiftWishListByEmployeeId(employeeId: Int, loadGiftCallback: GiftDataSource.LoadGiftCallback) {
         //TODO: Add implementation for remote data source
-        return giftLocalDataSource.getGiftWishList()
+        return giftLocalDataSource.loadGiftWishListByEmployeeId(employeeId, loadGiftCallback)
     }
 
-    override fun loadGiftWishListByEmployeeId(employeeId: Int): LiveData<List<Gift>>? {
+    override fun loadGiftWishListByEmployeeEmail(email: String,  loadGiftCallback: GiftDataSource.LoadGiftCallback) {
         //TODO: Add implementation for remote data source
-        return giftLocalDataSource.loadGiftWishListByEmployeeId(employeeId)
-    }
-
-    override fun loadGiftWishListByEmployeeEmail(employeeId: Int): LiveData<List<Gift>>? {
-        //TODO: Add implementation for remote data source
-        return giftLocalDataSource.loadGiftWishListByEmployeeEmail(employeeId)
+        return giftLocalDataSource.loadGiftWishListByEmployeeEmail(email, loadGiftCallback)
     }
 
     override fun saveGiftWish(gift: Gift) {
@@ -43,6 +39,11 @@ class GiftRepository(
     override fun removeGiftFromWishList(gift: Gift) {
         //TODO: Add implementation for remote data source
         giftLocalDataSource.removeGiftFromWishList(gift)
+    }
+
+    override fun onDestroy() {
+        giftLocalDataSource.onDestroy()
+        giftRemoteDataSource.onDestroy()
     }
 
     companion object {

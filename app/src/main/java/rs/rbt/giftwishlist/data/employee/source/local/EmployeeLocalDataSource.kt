@@ -1,13 +1,12 @@
 package rs.rbt.giftwishlist.data.employee.source.local
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.Observer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.warn
 import rs.rbt.giftwishlist.data.employee.Employee
 import rs.rbt.giftwishlist.data.employee.source.EmployeeDataSource
 import kotlin.coroutines.CoroutineContext
@@ -23,27 +22,34 @@ class EmployeeLocalDataSource(private val employeeDao: EmloyeeDao) : EmployeeDat
         get() = Dispatchers.Default + job
 
     private var observableEmployeeList: MediatorLiveData<List<Employee>> = MediatorLiveData()
+    private var employeeListObserver: Observer<List<Employee>>? = null
 
-    override fun loadData() {
+    override fun loadData(loadEmployeeCallback: EmployeeDataSource.LoadEmployeeCallback) {
+        employeeListObserver = Observer {
+            loadEmployeeCallback.onEmployeesLoaded(it)
+        }
+        employeeListObserver?.apply { observableEmployeeList.observeForever(this) }
+
         val allEmployees = employeeDao.getAll()
         observableEmployeeList.addSource(allEmployees) { employeeList ->
-            warn { "loadData = ${employeeList.size}" }
             observableEmployeeList.postValue(employeeList)
         }
     }
 
-    override fun getEmployees(): LiveData<List<Employee>> = observableEmployeeList
-
-    override fun findEmployeeByName(firstName: String, lastName: String): Employee? {
-        return employeeDao.findByName(firstName, lastName)
+    override fun findEmployeeByName(
+        firstName: String,
+        lastName: String,
+        getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback
+    ) {
+        employeeDao.findByName(firstName, lastName)
     }
 
-    override fun findEmployeeByEmail(email: String): Employee? {
-        return employeeDao.findByEmail(email)
+    override fun findEmployeeByEmail(email: String, getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
+        employeeDao.findByEmail(email)
     }
 
-    override fun findMeAsEmployee(): Employee? {
-        return findEmployeeByEmail("nemanja.stosic@rbt.rs")
+    override fun findMeAsEmployee(getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
+        findEmployeeByEmail("nemanja.stosic@rbt.rs", getEmployeeCallback)
     }
 
     override fun saveEmployee(employee: Employee) {

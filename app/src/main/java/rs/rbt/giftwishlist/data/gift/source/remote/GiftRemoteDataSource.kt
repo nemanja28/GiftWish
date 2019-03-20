@@ -11,18 +11,16 @@ import rs.rbt.giftwishlist.data.gift.source.GiftDataSource
  */
 object GiftRemoteDataSource : GiftDataSource, AnkoLogger {
 
-    override fun loadData(employeeId: Int) {
+
+    override fun loadGiftWishListByEmployeeId(employeeId: Int, loadGiftCallback: GiftDataSource.LoadGiftCallback){
     }
 
-    override fun loadGiftWishListByEmployeeId(employeeId: Int): LiveData<List<Gift>>? {
-        return null
+    override fun loadGiftWishListByEmployeeEmail(email: String, loadGiftCallback: GiftDataSource.LoadGiftCallback) {
     }
 
-    override fun loadGiftWishListByEmployeeEmail(employeeId: Int): LiveData<List<Gift>>? {
-        return null
-    }
+    override fun getGiftWishList(loadGiftCallback: GiftDataSource.LoadGiftCallback){
 
-    override fun getGiftWishList(): LiveData<List<Gift>> = MutableLiveData()
+    }
 
     override fun saveGiftWish(gift: Gift) {
     }
@@ -31,6 +29,10 @@ object GiftRemoteDataSource : GiftDataSource, AnkoLogger {
     }
 
     override fun removeGiftFromWishList(gift: Gift) {
+    }
+
+    override fun onDestroy() {
+
     }
 
 }

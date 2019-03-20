@@ -10,29 +10,25 @@ class EmployeeRepository(
     val localEmployeeDataSource: EmployeeDataSource,
     val remoteEmployeeDataSource: EmployeeDataSource
 ) : EmployeeDataSource {
-    override fun loadData() {
+
+    override fun loadData(loadEmployeeCallback: EmployeeDataSource.LoadEmployeeCallback) {
         //TODO: Add implementation for remote data source
-        localEmployeeDataSource.loadData()
+        localEmployeeDataSource.loadData(loadEmployeeCallback)
     }
 
-    override fun getEmployees(): LiveData<List<Employee>> {
+    override fun findEmployeeByName(firstName: String, lastName: String, getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
         //TODO: Add implementation for remote data source
-        return localEmployeeDataSource.getEmployees()
+        return localEmployeeDataSource.findEmployeeByName(firstName, lastName, getEmployeeCallback)
     }
 
-    override fun findEmployeeByName(firstName: String, lastName: String): Employee? {
+    override fun findEmployeeByEmail(email: String, getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
         //TODO: Add implementation for remote data source
-        return localEmployeeDataSource.findEmployeeByName(firstName, lastName)
+        return localEmployeeDataSource.findEmployeeByEmail(email, getEmployeeCallback)
     }
 
-    override fun findEmployeeByEmail(email: String): Employee? {
+    override fun findMeAsEmployee(getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
         //TODO: Add implementation for remote data source
-        return localEmployeeDataSource.findEmployeeByEmail(email)
-    }
-
-    override fun findMeAsEmployee(): Employee? {
-        //TODO: Add implementation for remote data source
-        return localEmployeeDataSource.findMeAsEmployee()
+        return localEmployeeDataSource.findMeAsEmployee(getEmployeeCallback)
     }
 
     override fun saveEmployee(employee: Employee) {

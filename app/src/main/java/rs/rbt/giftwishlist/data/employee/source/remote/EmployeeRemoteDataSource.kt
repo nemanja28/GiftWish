@@ -10,24 +10,16 @@ import rs.rbt.giftwishlist.data.employee.source.EmployeeDataSource
  */
 object EmployeeRemoteDataSource : EmployeeDataSource {
 
-    override fun loadData() {
-        
+    override fun loadData(loadEmployeeCallback: EmployeeDataSource.LoadEmployeeCallback) {
     }
 
-    override fun getEmployees(): LiveData<List<Employee>> {
-        return MutableLiveData()
+    override fun findEmployeeByName(firstName: String, lastName: String, getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
     }
 
-    override fun findEmployeeByName(firstName: String, lastName: String): Employee? {
-        return null
+    override fun findEmployeeByEmail(email: String, getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
     }
 
-    override fun findEmployeeByEmail(email: String): Employee? {
-        return null
-    }
-
-    override fun findMeAsEmployee(): Employee? {
-        return null
+    override fun findMeAsEmployee(getEmployeeCallback: EmployeeDataSource.GetEmployeeCallback) {
     }
 
     override fun saveEmployee(employee: Employee) {

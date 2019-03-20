@@ -1,7 +1,7 @@
 package rs.rbt.giftwishlist.data.gift.source.local
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.Observer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,23 +22,31 @@ class GiftLocalDataSource(private val giftDao: GiftDao) : CoroutineScope, AnkoLo
         get() = Dispatchers.Default + job
 
     private var observableGiftWishList: MediatorLiveData<List<Gift>> = MediatorLiveData()
+    private var giftWishListObserver: Observer<List<Gift>>? = null
 
-    override fun loadData(employeeId: Int) {
-        val giftWishList = loadGiftWishListByEmployeeId(employeeId)
+
+    override fun loadGiftWishListByEmployeeId(employeeId: Int, loadGiftCallback: GiftDataSource.LoadGiftCallback) {
+        giftWishListObserver = Observer {
+            loadGiftCallback.onGiftsLoaded(it)
+        }
+        giftWishListObserver?.apply {
+            observableGiftWishList.observeForever(this)
+        }
+
+        val giftWishList = giftDao.getGiftWishListByEmployeeId(employeeId)
         observableGiftWishList.addSource(giftWishList) { myGiftList ->
             observableGiftWishList.postValue(myGiftList)
         }
     }
 
-    override fun loadGiftWishListByEmployeeId(employeeId: Int): LiveData<List<Gift>> {
-        return giftDao.getGiftWishListByEmployeeId(employeeId)
+    override fun loadGiftWishListByEmployeeEmail(email: String, loadGiftCallback: GiftDataSource.LoadGiftCallback) {
     }
 
-    override fun loadGiftWishListByEmployeeEmail(employeeId: Int): LiveData<List<Gift>>? {
-        return null
+    override fun getGiftWishList(loadGiftCallback: GiftDataSource.LoadGiftCallback) {
+        observableGiftWishList.value?.let {
+            loadGiftCallback.onGiftsLoaded(it)
+        } ?: run { loadGiftCallback.onDataNotAvailable() }
     }
-
-    override fun getGiftWishList(): LiveData<List<Gift>> = observableGiftWishList
 
     override fun saveGiftWish(gift: Gift) {
         launch { giftDao.insertAll(gift) }
@@ -50,6 +58,12 @@ class GiftLocalDataSource(private val giftDao: GiftDao) : CoroutineScope, AnkoLo
 
     override fun removeGiftFromWishList(gift: Gift) {
         launch { giftDao.delete(gift) }
+    }
+
+    override fun onDestroy() {
+        giftWishListObserver?.let {
+            observableGiftWishList.removeObserver(it)
+        }
     }
 
     companion object {

@@ -2,23 +2,19 @@ package rs.rbt.giftwishlist.splash
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import rs.rbt.giftwishlist.SingleLiveEvent
 import rs.rbt.giftwishlist.data.authorization.AuthorizationRepository
 import kotlin.coroutines.CoroutineContext
 
-class SplashViewModel(application: Application, private val authorizationRepository: AuthorizationRepository) : AndroidViewModel(application), CoroutineScope {
-
-    private var job: Job = Job()
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
+class SplashViewModel(application: Application, private val authorizationRepository: AuthorizationRepository) : AndroidViewModel(application) {
 
     val onLoginSuccessEvent = SingleLiveEvent<Void>()
     val onLoginFailedEvent = SingleLiveEvent<String>()
 
     fun viewDidLoad() {
-        launch {
+        viewModelScope.launch {
             delay(3000)
             loginUserAutomaticallyIfPossible()
         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import rs.rbt.giftwishlist.data.employee.Employee
+import rs.rbt.giftwishlist.data.employee.source.EmployeeDataSource
 import rs.rbt.giftwishlist.data.employee.source.EmployeeRepository
 
 /**
@@ -13,11 +14,18 @@ import rs.rbt.giftwishlist.data.employee.source.EmployeeRepository
  */
 class EmployeesViewModel(application: Application, private val employeeRepository: EmployeeRepository) : AndroidViewModel(application) {
 
-    private var mObservableEmployeesList: LiveData<List<Employee>> = MutableLiveData()
+    private var mObservableEmployeesList: MutableLiveData<List<Employee>> = MutableLiveData()
 
     init {
-        employeeRepository.loadData()
-        mObservableEmployeesList = employeeRepository.getEmployees()
+        employeeRepository.loadData(object :EmployeeDataSource.LoadEmployeeCallback{
+            override fun onEmployeesLoaded(employees: List<Employee>) {
+                mObservableEmployeesList.postValue(employees)
+            }
+
+            override fun onDataNotAvailable() {
+            }
+        })
+        //mObservableEmployeesList = employeeRepository.getEmployees()
     }
 
 
